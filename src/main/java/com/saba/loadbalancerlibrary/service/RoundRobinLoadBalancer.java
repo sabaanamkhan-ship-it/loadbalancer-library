@@ -1,10 +1,13 @@
 package com.saba.loadbalancerlibrary.service;
 
 import com.saba.loadbalancerlibrary.dto.ServiceInstanceDto;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Service
 public class RoundRobinLoadBalancer implements LoadBalancer {
 
     private final AtomicInteger currentIndex = new AtomicInteger(-1);
