@@ -3,12 +3,19 @@ package com.saba.loadbalancerlibrary.service;
 import com.saba.loadbalancerlibrary.dto.ServiceInstanceDto;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RoundRobinLoadBalancer implements LoadBalancer {
 
+    private final AtomicInteger currentIndex = new AtomicInteger(-1);
+
     @Override
     public ServiceInstanceDto selectInstance(List<ServiceInstanceDto> instances) {
-        // TODO: Phase 3 mein implement karenge
-        return null;
+        if (instances == null || instances.isEmpty()) {
+            throw new IllegalArgumentException("Instance list is empty");
+        }
+
+        int index = currentIndex.updateAndGet(i -> (i + 1) % instances.size());
+        return instances.get(index);
     }
 }
