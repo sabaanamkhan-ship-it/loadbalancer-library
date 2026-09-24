@@ -2,6 +2,7 @@ package com.saba.loadbalancerlibrary.controller;
 
 import com.saba.loadbalancerlibrary.dto.ServiceInstanceDto;
 import com.saba.loadbalancerlibrary.service.LeastConnectionsLoadBalancer;
+import com.saba.loadbalancerlibrary.service.RandomLoadBalancer;
 import com.saba.loadbalancerlibrary.service.RoundRobinLoadBalancer;
 import com.saba.loadbalancerlibrary.service.WeightedRoundRobinLoadBalancer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,11 @@ public class LoadBalancerController {
 
     @Autowired
     private LeastConnectionsLoadBalancer leastConnectionsLoadBalancer;
+
+    @Autowired
+    private RandomLoadBalancer randomLoadBalancer;
+
+
 
     private final List<ServiceInstanceDto> instances = List.of(
             ServiceInstanceDto.builder().id("instance-1").host("localhost").port(8081).build(),
@@ -66,5 +72,10 @@ public class LoadBalancerController {
     @GetMapping("/connection-count/{instanceId}")
     public String getConnectionCount(@PathVariable String instanceId) {
         return leastConnectionsLoadBalancer.getConnectionCount(instanceId, leastConnInstances);
+    }
+
+    @GetMapping("/select-random-instance")
+    public ServiceInstanceDto selectRandomInstance() {
+        return randomLoadBalancer.selectInstance(instances); // wahi purani 4-instance wali list use kar lo
     }
 }
