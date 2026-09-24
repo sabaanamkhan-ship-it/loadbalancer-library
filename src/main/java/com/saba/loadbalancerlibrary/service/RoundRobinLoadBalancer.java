@@ -1,5 +1,6 @@
 package com.saba.loadbalancerlibrary.service;
 
+import com.saba.loadbalancerlibrary.dto.RequestContext;
 import com.saba.loadbalancerlibrary.dto.ServiceInstanceDto;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
     private final AtomicInteger currentIndex = new AtomicInteger(-1);
 
     @Override
-    public ServiceInstanceDto selectInstance(List<ServiceInstanceDto> instances) {
+    public ServiceInstanceDto selectInstance(List<ServiceInstanceDto> instances, RequestContext context) {
         if (instances == null || instances.isEmpty()) {
             throw new IllegalArgumentException("Instance list is empty");
         }

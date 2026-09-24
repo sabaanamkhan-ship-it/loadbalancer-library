@@ -1,5 +1,6 @@
 package com.saba.loadbalancerlibrary.service;
 
+import com.saba.loadbalancerlibrary.dto.RequestContext;
 import com.saba.loadbalancerlibrary.dto.ServiceInstanceDto;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ public class WeightedRoundRobinLoadBalancer implements LoadBalancer {
     private final Map<String, Integer> currentWeights = new ConcurrentHashMap<>();
 
     @Override
-    public synchronized ServiceInstanceDto selectInstance(List<ServiceInstanceDto> instances) {
+    public synchronized ServiceInstanceDto selectInstance(List<ServiceInstanceDto> instances, RequestContext context) {
         if (instances == null || instances.isEmpty()) {
             throw new IllegalArgumentException("Instance list is empty");
         }

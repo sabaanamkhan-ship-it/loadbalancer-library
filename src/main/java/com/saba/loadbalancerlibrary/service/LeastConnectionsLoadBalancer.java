@@ -1,5 +1,6 @@
 package com.saba.loadbalancerlibrary.service;
 
+import com.saba.loadbalancerlibrary.dto.RequestContext;
 import com.saba.loadbalancerlibrary.dto.ServiceInstanceDto;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ public class LeastConnectionsLoadBalancer implements LoadBalancer {
     private final Map<String, AtomicInteger> activeConnections = new ConcurrentHashMap<>();
 
     @Override
-    public ServiceInstanceDto selectInstance(List<ServiceInstanceDto> instances) {
+    public ServiceInstanceDto selectInstance(List<ServiceInstanceDto> instances, RequestContext context) {
         if (instances == null || instances.isEmpty()) {
             throw new IllegalArgumentException("Instance list is empty");
         }
@@ -35,7 +36,6 @@ public class LeastConnectionsLoadBalancer implements LoadBalancer {
         }
 
         activeConnections.get(selected.getId()).incrementAndGet();
-
         return selected;
     }
 
@@ -48,7 +48,7 @@ public class LeastConnectionsLoadBalancer implements LoadBalancer {
 
     public <T> T executeWithLoadBalancing(List<ServiceInstanceDto> instances,
                                           Function<ServiceInstanceDto, T> requestLogic) {
-        ServiceInstanceDto selected = selectInstance(instances);
+        ServiceInstanceDto selected = selectInstance(instances, null);
         try {
             return requestLogic.apply(selected);
         } finally {
@@ -59,11 +59,9 @@ public class LeastConnectionsLoadBalancer implements LoadBalancer {
     public String getConnectionCount(String instanceId, List<ServiceInstanceDto> validInstances) {
         boolean exists = validInstances.stream()
                 .anyMatch(instance -> instance.getId().equals(instanceId));
-
         if (!exists) {
             return "Instance '" + instanceId + "' does not exist in the given list";
         }
-
         AtomicInteger count = activeConnections.get(instanceId);
         int currentCount = count != null ? count.get() : 0;
         return instanceId + " has " + currentCount + " active connections";
