@@ -11,6 +11,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,16 +28,15 @@ public class LoadBalancerController {
     public ServiceInstanceDto selectInstance(HttpServletRequest request) {
         LoadBalancer loadBalancer = loadBalancerFactory.getLoadBalancer();
 
-        // Eureka se "DUMMY-SERVICE" naam ki saari live instances utha lo
         List<ServiceInstance> eurekaInstances = discoveryClient.getInstances("DUMMY-SERVICE");
 
-        // Eureka ke ServiceInstance ko apne ServiceInstanceDto mein convert karo
         List<ServiceInstanceDto> instances = eurekaInstances.stream()
                 .map(instance -> ServiceInstanceDto.builder()
                         .id(instance.getInstanceId())
                         .host(instance.getHost())
                         .port(instance.getPort())
                         .build())
+                .sorted(Comparator.comparing(ServiceInstanceDto::getId))
                 .collect(Collectors.toList());
 
         String clientIp = request.getRemoteAddr();
