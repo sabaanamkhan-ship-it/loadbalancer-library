@@ -15,6 +15,7 @@ Built as a hands-on system design project: implementing core distributed-systems
 - **Thread-safe implementations** — `AtomicInteger`, `ConcurrentHashMap`, and `synchronized` used where correctness under concurrency actually requires it
 - **Dockerized** — full stack (Eureka + Config Server + this library) runs with a single `docker-compose up`
 - **Published to Docker Hub** — usable without building from source
+- **CI/CD via GitHub Actions** — every push to `main` builds the project with Maven, then builds the Docker image and pushes it to Docker Hub automatically. Docker Hub credentials are stored as GitHub Secrets.
 
 ---
 
@@ -131,7 +132,6 @@ The library never hardcodes a target service name — the calling service decide
 ## What's Not Included (Yet)
 
 - **Consistent Hashing** — IP Hash currently uses simple modulo hashing (`clientIp.hashCode() % instances.size()`). This means that whenever the instance list changes — a server is added or removed — most existing client-to-server mappings shift, even for clients whose IP never changed. This breaks session/cache stickiness right when it matters most (during a scaling event). Consistent Hashing (placing servers and clients on a hash ring) solves this by affecting only the clients nearest to the changed instance, leaving everyone else's mapping untouched.
-- CI/CD pipeline
 - Cloud deployment
 
 ---
